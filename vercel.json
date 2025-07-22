@@ -1,0 +1,14 @@
+{
+    "rewrites": [
+        {"source": "/(.*)", "destination": "/index.html"}
+    ],
+    "images": {
+        "sizes": [1024],
+        "remotePatterns": [
+            {
+                "protocol": "https",
+                "hostname": "gateway.pinata.cloud"
+            }
+        ]
+    }
+}
