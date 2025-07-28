@@ -11,27 +11,27 @@ export const useReadWriteFhenixContract = () => {
     const { smartAccountClientFhenix } = useSmartAccount();
 
     const processTransactionWrite = useCallback(async () => {
-          const hash = await smartAccountClientFhenix.sendTransaction({
-              account: smartAccountClientFhenix.account!,
-              chain: SELECTED_NETWORK_FHENIX,
-              to: COUNTER_FHENIX,
-              data: encodeFunctionData({
-                  abi: SimpleCounterAbi,
-                  functionName: "increment_counter",
-                  args: [],
-              })
-          });
+        const hash = await smartAccountClientFhenix.sendTransaction({
+            account: smartAccountClientFhenix.account!,
+            chain: SELECTED_NETWORK_FHENIX,
+            to: COUNTER_FHENIX,
+            data: encodeFunctionData({
+                abi: SimpleCounterAbi,
+                functionName: "increment_counter",
+                args: [],
+            })
+        });
 
-          console.log({hash});
+        console.log({hash});
 
-          await waitForTransactionReceipt(config, {
-              hash,
-              confirmations: 2,
-              pollingInterval: 300,
-              chainId: SELECTED_NETWORK_FHENIX.id
-          });
+        await waitForTransactionReceipt(config, {
+            hash,
+            confirmations: 2,
+            pollingInterval: 300,
+            chainId: SELECTED_NETWORK_FHENIX.id
+        });
 
-          return hash;
+        return hash;
     }, [smartAccountClientFhenix]);
 
 

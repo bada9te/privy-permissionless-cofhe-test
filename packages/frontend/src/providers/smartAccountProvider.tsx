@@ -30,16 +30,16 @@ interface SmartAccountInterface {
   /** Smart account client to send signature/transaction requests to the smart account */
   /**Fhenix Client */
   smartAccountClientFhenix:
-    | SmartAccountClient<
-        EntryPoint,
-        Transport,
-        Chain,
-        SmartAccount<EntryPoint, string, Transport, Chain>
-      >
-    | Transport
-    | any
-    | SmartAccount<EntryPoint, string, Transport, Chain>
-    | null;
+      | SmartAccountClient<
+      EntryPoint,
+      Transport,
+      Chain,
+      SmartAccount<EntryPoint, string, Transport, Chain>
+  >
+      | Transport
+      | any
+      | SmartAccount<EntryPoint, string, Transport, Chain>
+      | null;
   /** Smart account address */
   smartAccountAddress: `0x${string}` | undefined;
   /** Boolean to indicate whether the smart account state has initialized */
@@ -157,7 +157,7 @@ export const SmartAccountProvider = ({ children }: { children: React.ReactNode }
       });
       //
 
-      
+
       const smartAccountAddress = smartAccountClientFhenix.account?.address;
 
       setSmartAccountAddress(smartAccountAddress);
@@ -172,16 +172,16 @@ export const SmartAccountProvider = ({ children }: { children: React.ReactNode }
   }, [embeddedWallet?.address]);
 
   return (
-    <SmartAccountContext.Provider
-      value={{
-        smartAccountReady: smartAccountReady,
-        smartAccountClientFhenix: smartAccountClientFhenix,
-        smartAccountAddress: smartAccountAddress,
-        eoa: eoa,
-        fhenixInitData,
-      }}
-    >
-      {children}
-    </SmartAccountContext.Provider>
+      <SmartAccountContext.Provider
+          value={{
+            smartAccountReady: smartAccountReady,
+            smartAccountClientFhenix: smartAccountClientFhenix,
+            smartAccountAddress: smartAccountAddress,
+            eoa: eoa,
+            fhenixInitData,
+          }}
+      >
+        {children}
+      </SmartAccountContext.Provider>
   );
 };

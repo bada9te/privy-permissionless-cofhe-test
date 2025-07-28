@@ -3,6 +3,15 @@
 @tailwind components;
 @tailwind utilities;
 
+@font-face {
+  font-family: "Berlin";
+  src: url("./fonts/BRLNSR.TTF");
+}
+
+@font-face {
+  font-family: "Berlin-Bold";
+  src: url("./fonts/BRLNSB.TTF");
+}
 
 .swipe {
   position: absolute;

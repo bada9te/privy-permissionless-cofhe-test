@@ -20,31 +20,31 @@ const queryClient = new QueryClient();
 
 
 root.render(
-        <PrivyProvider
-            appId={PRIVY_APP_ID || ""}
-            config={{
-                loginMethods: ["email", "wallet"],
-                appearance: {
-                    theme: "light",
-                },
-                embeddedWallets: {
-                    createOnLogin: "all-users",
-                    noPromptOnSignature: true,
-                },
-                defaultChain: SELECTED_NETWORK_FHENIX,
-                supportedChains: [SELECTED_NETWORK_FHENIX],
-            }}
-        >
-            <SmartAccountProvider>
-                <QueryClientProvider client={queryClient}>
-                    <WagmiProvider config={config}>
-                      <BrowserRouter>
+    <PrivyProvider
+        appId={PRIVY_APP_ID || ""}
+        config={{
+            loginMethods: ["email", "wallet"],
+            appearance: {
+                theme: "light",
+            },
+            embeddedWallets: {
+                createOnLogin: "all-users",
+                noPromptOnSignature: true,
+            },
+            defaultChain: SELECTED_NETWORK_FHENIX,
+            supportedChains: [SELECTED_NETWORK_FHENIX],
+        }}
+    >
+        <SmartAccountProvider>
+            <QueryClientProvider client={queryClient}>
+                <WagmiProvider config={config}>
+                    <BrowserRouter>
                         <App />
-                      </BrowserRouter>
-                    </WagmiProvider>
-                </QueryClientProvider>
-            </SmartAccountProvider>
-        </PrivyProvider>
+                    </BrowserRouter>
+                </WagmiProvider>
+            </QueryClientProvider>
+        </SmartAccountProvider>
+    </PrivyProvider>
 );
 
 Modal.setAppElement("#root");

@@ -3,9 +3,9 @@ import TEST from "./screens/TEST";
 
 function App() {
   return (
-    <Routes>
-      <Route path="/" element={<TEST />}/>
-    </Routes>
+      <Routes>
+        <Route path="/" element={<TEST/>}/>
+      </Routes>
   );
 }
 
