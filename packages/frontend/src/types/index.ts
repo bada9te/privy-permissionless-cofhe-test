@@ -15,9 +15,3 @@ export type Race = {
   numOfPlayersRequired: number;
 };
 
-
-declare global {
-  interface Window {
-    fhenixjs: any;
-  }
-}

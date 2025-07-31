@@ -1,21 +1,21 @@
-import { cofhejs } from "cofhejs/web";
 import { useEffect, useState } from "react";
 import { useSmartAccount } from "@/providers/smartAccountProvider";
-import { createWalletClient, custom } from "viem";
-import { SELECTED_NETWORK_FHENIX } from "@/config/constants";
+
+import { cofhejs, Permit } from "cofhejs/web";
 
 
 export function useFhenix() {
-    const { fhenixInitData, eoa, smartAccountAddress, smartAccountClientFhenix } = useSmartAccount();
+    const { fhenixInitData, eoa, smartAccountClientFhenix } = useSmartAccount();
 
     const [isInitialized, setIsInitialized] = useState(false);
     const [isInitializing, setIsInitializing] = useState(false);
     const [error, setError] = useState<Error | null>(null);
-    const [permit, setPermit] = useState();
+    const [permit, setPermit] = useState<Permit | null>(null);
 
 
     useEffect(() => {
         const init = async () => {
+            //console.log("init", fhenixInitData);
             if (
                 !eoa ||
                 !fhenixInitData?.client ||
@@ -26,37 +26,39 @@ export function useFhenix() {
             )
                 return;
 
+            console.log("init", fhenixInitData);
+
             try {
                 setIsInitializing(true);
 
-                const eip1193provider = await eoa.getEthereumProvider();
-
-                const viemWalletClient = createWalletClient({
-                    account: eoa.address as `0x${string}`,
-                    chain: SELECTED_NETWORK_FHENIX,
-                    transport: custom(eip1193provider),
-                });
-
                 const result = await cofhejs.initializeWithViem({
-                    viemClient: smartAccountClientFhenix,         // viem PublicClient
-                    viemWalletClient: viemWalletClient,        // viem WalletClient
+                    viemClient: fhenixInitData.client,         // viem PublicClient
+                    viemWalletClient: fhenixInitData.walletClient,        // viem WalletClient
                     environment: "TESTNET",
-                    wasmPath: "/tfhe_bg.wasm",
                     generatePermit: true,
                 });
+
 
                 await cofhejs.createPermit().then(console.log)
 
 
-
                 if (result.success) {
-                    setPermit(result.data);
+                    setPermit(result.data as Permit);
                     setIsInitialized(true);
                     setError(null);
                 } else {
                     throw new Error(result.error.message || "Cofhe init failed");
                 }
+
+                // Get the current active permit
+                const permit = cofhejs.getPermit();
+
+                // Extract permission data for contract calls
+                const permission = permit.data?.getPermission();
+
+                console.log({ permit, permission })
             } catch (err) {
+                console.error(err);
                 setError(err instanceof Error ? err : new Error("Unknown error"));
             } finally {
                 setIsInitializing(false);
@@ -64,13 +66,13 @@ export function useFhenix() {
         };
 
         init();
-    }, [eoa, fhenixInitData, isInitialized, isInitializing, smartAccountClientFhenix]);
+    }, [eoa, fhenixInitData, smartAccountClientFhenix]);
 
     return {
         isInitialized,
         isInitializing,
         error,
         permit,
-        cofhe: cofhejs,
+        cofhe: cofhejs
     };
 }

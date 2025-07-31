@@ -46,6 +46,17 @@ export default function TEST() {
     }, [smartAccountClientFhenix, TEST_Fhenix_ReadEncrypted]);
 
 
+    const testEncrypt = async () => {
+        if (!cofhe) return;
+
+        const loger = (data: any) => {
+            console.log(data);
+        }
+        const encrypted = await cofhe.encrypt([Encryptable.uint64(10)], loger);
+        console.log(encrypted);
+
+    }
+
 
 
     // LOGIN / LOGOUT WITH PRIVY
@@ -115,6 +126,7 @@ export default function TEST() {
             <button className={"text-white bg-red-500 m-2 p-2"} onClick={decrypt}>Decrypt</button>
             <button className={"text-white bg-red-500 m-2 p-2"} onClick={read}>Read</button>
             <button className={"text-white bg-red-500 m-2 p-2"} onClick={readEncrypted}>Read Encrypted</button>
+            <button className={"text-white bg-red-500 m-2 p-2"} onClick={testEncrypt}>TEST Encrypt</button>
         </>
     );
 }
