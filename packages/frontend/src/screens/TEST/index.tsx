@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useState } from "react";
 import {useReadWriteFhenixContract} from "@/hooks/TEST_Fhenix";
 import {useSmartAccount} from "@/providers/smartAccountProvider";
-import {useFhenix} from "@/hooks/TEST_UseFhenix";
+import {useFhenix} from "@/hooks/TEST_useFhenix";
 import { useLinkWithSiwe, useLogin, usePrivy } from "@privy-io/react-auth";
 import { SELECTED_NETWORK_FHENIX } from "@/config/constants";
 
