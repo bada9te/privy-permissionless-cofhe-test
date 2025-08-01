@@ -82,10 +82,36 @@ export const useReadWriteFhenixContract = () => {
     }, [smartAccountClientFhenix]);
 
 
+    const processWriteEncrypted = useCallback(async (encryptedUint64: any) => {
+        const hash = await smartAccountClientFhenix.sendTransaction({
+            account: smartAccountClientFhenix.account!,
+            chain: SELECTED_NETWORK_FHENIX,
+            to: COUNTER_FHENIX,
+            data: encodeFunctionData({
+                abi: SimpleCounterAbi,
+                functionName: "reset_counter",
+                args: [encryptedUint64],
+            })
+        });
+
+        console.log({hash});
+
+        await waitForTransactionReceipt(config, {
+            hash,
+            confirmations: 2,
+            pollingInterval: 300,
+            chainId: SELECTED_NETWORK_FHENIX.id
+        });
+
+        return hash;
+    }, [smartAccountClientFhenix]);
+
+
     return {
         TEST_Fhenix_Write: processTransactionWrite,
         TEST_Fhenix_Decrypt: processTransactionDecrypt,
         TEST_Fhenix_Read: processRead,
         TEST_Fhenix_ReadEncrypted: processReadEncrypted,
+        TEST_Fhenix_WriteEncrypted: processWriteEncrypted,
     };
 }

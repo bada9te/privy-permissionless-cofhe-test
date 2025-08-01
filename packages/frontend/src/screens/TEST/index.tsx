@@ -3,7 +3,8 @@ import {useReadWriteFhenixContract} from "@/hooks/TEST_Fhenix";
 import {useSmartAccount} from "@/providers/smartAccountProvider";
 import {useFhenix} from "@/hooks/TEST_useFhenix";
 import { useLinkWithSiwe, useLogin, usePrivy } from "@privy-io/react-auth";
-import { SELECTED_NETWORK_FHENIX } from "@/config/constants";
+import { COUNTER_FHENIX, SELECTED_NETWORK_FHENIX } from "@/config/constants";
+import { Encryptable, EncryptStep, FheTypes, Permit, SealingKey } from "cofhejs/web";
 
 
 export default function TEST() {
@@ -13,8 +14,9 @@ export default function TEST() {
         TEST_Fhenix_Read,
         TEST_Fhenix_Decrypt,
         TEST_Fhenix_ReadEncrypted,
+        TEST_Fhenix_WriteEncrypted,
     } = useReadWriteFhenixContract();
-    const { cofhe } = useFhenix();
+    const { cofhe, permit } = useFhenix();
 
     const write = useCallback(() => {
         if (smartAccountClientFhenix) {
@@ -40,22 +42,54 @@ export default function TEST() {
 
 
     const readEncrypted = useCallback(() => {
-        if (smartAccountClientFhenix) {
-            TEST_Fhenix_ReadEncrypted().then(console.log);
+        console.log({ smartAccountClientFhenix, permit, smartAccountAddress })
+        if (smartAccountClientFhenix && permit && smartAccountAddress) {
+            console.log(`Read encrypted encrypted`);
+            TEST_Fhenix_ReadEncrypted().then(async encryptedData => {
+                console.log(`Encrypted: ${encryptedData}`);
+
+                // Unseal
+                const result = await cofhe.unseal(
+                  BigInt(encryptedData as any),
+                  FheTypes.Uint32,
+                  permit.issuer,
+                  permit.getHash()
+                );
+
+                if (!result.success) {
+                    console.error('Failed to unseal:', result.error)
+                    return
+                }
+
+                console.log(result.data);
+            });
         }
-    }, [smartAccountClientFhenix, TEST_Fhenix_ReadEncrypted]);
+    }, [smartAccountClientFhenix, TEST_Fhenix_ReadEncrypted, permit, cofhe, smartAccountAddress]);
+
+    console.log(permit)
 
 
-    const testEncrypt = async () => {
+    const writeEncrypted = useCallback(async () => {
         if (!cofhe) return;
 
-        const loger = (data: any) => {
-            console.log(data);
+        const logger = (state: EncryptStep) => {
+            console.log(`Log Encrypt State :: ${state}`);
         }
-        const encrypted = await cofhe.encrypt([Encryptable.uint64(10)], loger);
-        console.log(encrypted);
+        const encryptedValues = await cofhe.encrypt(
+          [Encryptable.uint64("10")],
+          logger
+        );
 
-    }
+        console.log(encryptedValues.data)
+
+        TEST_Fhenix_WriteEncrypted(encryptedValues.data?.[0]).then(console.log)
+    }, [TEST_Fhenix_WriteEncrypted, cofhe]);
+
+
+
+
+
+
 
 
 
@@ -126,7 +160,7 @@ export default function TEST() {
             <button className={"text-white bg-red-500 m-2 p-2"} onClick={decrypt}>Decrypt</button>
             <button className={"text-white bg-red-500 m-2 p-2"} onClick={read}>Read</button>
             <button className={"text-white bg-red-500 m-2 p-2"} onClick={readEncrypted}>Read Encrypted</button>
-            <button className={"text-white bg-red-500 m-2 p-2"} onClick={testEncrypt}>TEST Encrypt</button>
+            <button className={"text-white bg-red-500 m-2 p-2"} onClick={writeEncrypted}>Write Encrypted</button>
         </>
     );
 }

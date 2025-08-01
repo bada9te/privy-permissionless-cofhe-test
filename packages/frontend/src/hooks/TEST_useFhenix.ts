@@ -5,7 +5,7 @@ import { cofhejs, Permit } from "cofhejs/web";
 
 
 export function useFhenix() {
-    const { fhenixInitData, eoa, smartAccountClientFhenix } = useSmartAccount();
+    const { fhenixInitData, eoa, smartAccountClientFhenix, smartAccountAddress } = useSmartAccount();
 
     const [isInitialized, setIsInitialized] = useState(false);
     const [isInitializing, setIsInitializing] = useState(false);
@@ -22,7 +22,8 @@ export function useFhenix() {
                 !fhenixInitData?.walletClient ||
                 isInitialized ||
                 isInitializing ||
-                !smartAccountClientFhenix
+                !smartAccountClientFhenix ||
+                !smartAccountAddress
             )
                 return;
 
@@ -35,18 +36,16 @@ export function useFhenix() {
                     viemClient: fhenixInitData.client,         // viem PublicClient
                     viemWalletClient: fhenixInitData.walletClient,        // viem WalletClient
                     environment: "TESTNET",
-                    generatePermit: true,
+                    generatePermit: false,
                 });
 
 
-                await cofhejs.createPermit().then(console.log)
+                await cofhejs.createPermit({
+                    issuer: smartAccountAddress as any,
+                    type: 'self'
+                }).then(console.log);
 
-
-                if (result.success) {
-                    setPermit(result.data as Permit);
-                    setIsInitialized(true);
-                    setError(null);
-                } else {
+                if (!result.success) {
                     throw new Error(result.error.message || "Cofhe init failed");
                 }
 
@@ -57,6 +56,10 @@ export function useFhenix() {
                 const permission = permit.data?.getPermission();
 
                 console.log({ permit, permission })
+
+                setPermit(permit.data);
+                setIsInitialized(true);
+                setError(null);
             } catch (err) {
                 console.error(err);
                 setError(err instanceof Error ? err : new Error("Unknown error"));
@@ -66,7 +69,7 @@ export function useFhenix() {
         };
 
         init();
-    }, [eoa, fhenixInitData, smartAccountClientFhenix]);
+    }, [eoa, fhenixInitData, smartAccountClientFhenix, smartAccountAddress]);
 
     return {
         isInitialized,
